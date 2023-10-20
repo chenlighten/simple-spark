@@ -40,8 +40,9 @@ trait Logging {
   def logInfo(msg: => String, throwable: Throwable) =
     if (log.isInfoEnabled) log.info(msg, throwable)
 
-  def logDebug(msg: => String, throwable: Throwable) =
+  def logDebug(msg: => String, throwable: Throwable) = {
     if (log.isDebugEnabled) log.debug(msg, throwable)
+  }
 
   def logWarning(msg: => String, throwable: Throwable) =
     if (log.isWarnEnabled) log.warn(msg, throwable)

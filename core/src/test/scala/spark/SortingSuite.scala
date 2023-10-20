@@ -2,10 +2,12 @@ package spark
 
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import SparkContext._
 
-class SortingSuite extends FunSuite with BeforeAndAfter with ShouldMatchers with Logging {
+import scala.util.Random
+
+class SortingSuite extends FunSuite with BeforeAndAfter with Matchers with Logging {
   
   var sc: SparkContext = _
   

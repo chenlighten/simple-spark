@@ -3,7 +3,7 @@ package spark
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.PrivateMethodTester
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 class DummyClass1 {}
 
@@ -21,7 +21,7 @@ class DummyClass4(val d: DummyClass3) {
 }
 
 class SizeEstimatorSuite extends FunSuite
-    with BeforeAndAfterAll with PrivateMethodTester with ShouldMatchers {
+    with BeforeAndAfterAll with PrivateMethodTester with Matchers {
   var oldArch: String = _
   var oldOops: String = _
 
@@ -37,11 +37,11 @@ class SizeEstimatorSuite extends FunSuite
   }
 
   test("simple classes") {
-    expect(16)(SizeEstimator.estimate(new DummyClass1))
-    expect(16)(SizeEstimator.estimate(new DummyClass2))
-    expect(24)(SizeEstimator.estimate(new DummyClass3))
-    expect(24)(SizeEstimator.estimate(new DummyClass4(null)))
-    expect(48)(SizeEstimator.estimate(new DummyClass4(new DummyClass3)))
+    assert(16 == SizeEstimator.estimate(new DummyClass1))
+    assert(16 == SizeEstimator.estimate(new DummyClass2))
+    assert(24 == SizeEstimator.estimate(new DummyClass3))
+    assert(24 == SizeEstimator.estimate(new DummyClass4(null)))
+    assert(48 == SizeEstimator.estimate(new DummyClass4(new DummyClass3)))
   }
 
   // NOTE: The String class definition changed in JDK 7 to exclude the int fields count and length.
@@ -56,37 +56,37 @@ class SizeEstimatorSuite extends FunSuite
   }
 
   test("primitive arrays") {
-    expect(32)(SizeEstimator.estimate(new Array[Byte](10)))
-    expect(40)(SizeEstimator.estimate(new Array[Char](10)))
-    expect(40)(SizeEstimator.estimate(new Array[Short](10)))
-    expect(56)(SizeEstimator.estimate(new Array[Int](10)))
-    expect(96)(SizeEstimator.estimate(new Array[Long](10)))
-    expect(56)(SizeEstimator.estimate(new Array[Float](10)))
-    expect(96)(SizeEstimator.estimate(new Array[Double](10)))
-    expect(4016)(SizeEstimator.estimate(new Array[Int](1000)))
-    expect(8016)(SizeEstimator.estimate(new Array[Long](1000)))
+    assert(32 == SizeEstimator.estimate(new Array[Byte](10)))
+    assert(40 == SizeEstimator.estimate(new Array[Char](10)))
+    assert(40 == SizeEstimator.estimate(new Array[Short](10)))
+    assert(56 == SizeEstimator.estimate(new Array[Int](10)))
+    assert(96 == SizeEstimator.estimate(new Array[Long](10)))
+    assert(56 == SizeEstimator.estimate(new Array[Float](10)))
+    assert(96 == SizeEstimator.estimate(new Array[Double](10)))
+    assert(4016 == SizeEstimator.estimate(new Array[Int](1000)))
+    assert(8016 == SizeEstimator.estimate(new Array[Long](1000)))
   }
 
   test("object arrays") {
     // Arrays containing nulls should just have one pointer per element
-    expect(56)(SizeEstimator.estimate(new Array[String](10)))
-    expect(56)(SizeEstimator.estimate(new Array[AnyRef](10)))
+    assert(56 == SizeEstimator.estimate(new Array[String](10)))
+    assert(56 == SizeEstimator.estimate(new Array[AnyRef](10)))
 
     // For object arrays with non-null elements, each object should take one pointer plus
     // however many bytes that class takes. (Note that Array.fill calls the code in its
     // second parameter separately for each object, so we get distinct objects.)
-    expect(216)(SizeEstimator.estimate(Array.fill(10)(new DummyClass1))) 
-    expect(216)(SizeEstimator.estimate(Array.fill(10)(new DummyClass2))) 
-    expect(296)(SizeEstimator.estimate(Array.fill(10)(new DummyClass3))) 
-    expect(56)(SizeEstimator.estimate(Array(new DummyClass1, new DummyClass2)))
+    assert(216 == SizeEstimator.estimate(Array.fill(10)(new DummyClass1)))
+    assert(216 == SizeEstimator.estimate(Array.fill(10)(new DummyClass2)))
+    assert(296 == SizeEstimator.estimate(Array.fill(10)(new DummyClass3)))
+    assert(56 == SizeEstimator.estimate(Array(new DummyClass1, new DummyClass2)))
 
     // Past size 100, our samples 100 elements, but we should still get the right size.
-    expect(28016)(SizeEstimator.estimate(Array.fill(1000)(new DummyClass3)))
+    assert(28016 == SizeEstimator.estimate(Array.fill(1000)(new DummyClass3)))
 
     // If an array contains the *same* element many times, we should only count it once.
     val d1 = new DummyClass1
-    expect(72)(SizeEstimator.estimate(Array.fill(10)(d1))) // 10 pointers plus 8-byte object
-    expect(432)(SizeEstimator.estimate(Array.fill(100)(d1))) // 100 pointers plus 8-byte object
+    assert(72 == SizeEstimator.estimate(Array.fill(10)(d1))) // 10 pointers plus 8-byte object
+    assert(432 == SizeEstimator.estimate(Array.fill(100)(d1))) // 100 pointers plus 8-byte object
 
     // Same thing with huge array containing the same element many times. Note that this won't
     // return exactly 4032 because it can't tell that *all* the elements will equal the first
@@ -104,10 +104,10 @@ class SizeEstimatorSuite extends FunSuite
     val initialize = PrivateMethod[Unit]('initialize)
     SizeEstimator invokePrivate initialize()
 
-    expect(40)(SizeEstimator.estimate(""))
-    expect(48)(SizeEstimator.estimate("a"))
-    expect(48)(SizeEstimator.estimate("ab"))
-    expect(56)(SizeEstimator.estimate("abcdefgh"))
+    assert(40 == SizeEstimator.estimate(""))
+    assert(48 == SizeEstimator.estimate("a"))
+    assert(48 == SizeEstimator.estimate("ab"))
+    assert(56 == SizeEstimator.estimate("abcdefgh"))
 
     resetOrClear("os.arch", arch)
   }

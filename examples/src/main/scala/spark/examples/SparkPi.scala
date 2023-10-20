@@ -6,7 +6,7 @@ import spark._
 import SparkContext._
 
 object SparkPi {
-  def main(args: Array[String]) {
+  def main(args: Array[String]) = {
     if (args.length == 0) {
       System.err.println("Usage: SparkPi <host> [<slices>]")
       System.exit(1)
@@ -14,7 +14,7 @@ object SparkPi {
     
     val spark = new SparkContext(args(0), "SparkPi",  System.getenv("SPARK_HOME"), List(System.getenv("SPARK_EXAMPLES_JAR")))
     val slices = if (args.length > 1) args(1).toInt else 2
-    val n = 100000 * slices
+    val n = 10000000 * slices
     val count = spark.parallelize(1 to n, slices).map { i =>
       val x = random * 2 - 1
       val y = random * 2 - 1

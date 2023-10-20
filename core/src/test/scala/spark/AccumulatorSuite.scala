@@ -1,11 +1,11 @@
 package spark
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import collection.mutable
 import spark.SparkContext._
 
-class AccumulatorSuite extends FunSuite with ShouldMatchers {
+class AccumulatorSuite extends FunSuite with Matchers {
 
   test ("basic accumulation"){
     val sc = new SparkContext("local", "test")
@@ -22,7 +22,9 @@ class AccumulatorSuite extends FunSuite with ShouldMatchers {
     val acc : Accumulator[Int] = sc.accumulator(0)
 
     val d = sc.parallelize(1 to 20)
-    evaluating {d.foreach{x => acc.value = x}} should produce [Exception]
+    assertThrows[Exception] {
+      d.foreach{x => acc.value = x}
+    }
     sc.stop()
   }
 
@@ -67,12 +69,11 @@ class AccumulatorSuite extends FunSuite with ShouldMatchers {
     val sc = new SparkContext("local[" + nThreads + "]", "test")
       val acc: Accumulable[mutable.Set[Any], Any] = sc.accumulable(new mutable.HashSet[Any]())
       val d = sc.parallelize(1 to maxI)
-      val thrown = evaluating {
+      assertThrows[SparkException] {
         d.foreach {
           x => acc.value += x
         }
-      } should produce [SparkException]
-      println(thrown)
+      }
     }
   }
 

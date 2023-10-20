@@ -44,7 +44,7 @@ private class LocalScheduler(threads: Int, maxFailures: Int) extends DAGSchedule
         val timeTaken = System.currentTimeMillis - startTime
         logInfo("Size of task %d is %d bytes and took %d ms to serialize".format(
             idInJob, bytes.size, timeTaken))
-        val deserializedTask = ser.deserialize[Task[_]](bytes, currentThread.getContextClassLoader)
+        val deserializedTask = ser.deserialize[Task[_]](bytes, Thread.currentThread.getContextClassLoader)
         val result: Any = deserializedTask.run(attemptId)
 
         // Serialize and deserialize the result to emulate what the mesos

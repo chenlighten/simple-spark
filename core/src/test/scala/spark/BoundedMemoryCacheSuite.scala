@@ -2,12 +2,12 @@ package spark
 
 import org.scalatest.FunSuite
 import org.scalatest.PrivateMethodTester
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
-class BoundedMemoryCacheSuite extends FunSuite with PrivateMethodTester with ShouldMatchers {
+class BoundedMemoryCacheSuite extends FunSuite with PrivateMethodTester with Matchers {
   test("constructor test") {
     val cache = new BoundedMemoryCache(60)
-    expect(60)(cache.getCapacity)
+    assert(60 == cache.getCapacity)
   }
 
   test("caching") {
@@ -34,13 +34,13 @@ class BoundedMemoryCacheSuite extends FunSuite with PrivateMethodTester with Sho
 
     //we cannot add this to cache (there is not enough space in cache) & we cannot evict the only value from
     //cache because it's from the same dataset
-    expect(CachePutFailure())(cache.put("1", 1, "Meh"))
+    assert(CachePutFailure() == cache.put("1", 1, "Meh"))
 
     //should be OK, dataset '1' can be evicted from cache
     cache.put("2", 0, "Meh") should (equal (CachePutSuccess(56)) or equal (CachePutSuccess(48)))
 
     //should fail, cache should obey it's capacity
-    expect(CachePutFailure())(cache.put("3", 0, "Very_long_and_useless_string"))
+    assert(CachePutFailure() == cache.put("3", 0, "Very_long_and_useless_string"))
 
     if (oldArch != null) {
       System.setProperty("os.arch", oldArch)
